@@ -1,0 +1,6 @@
+[submodule "consume_publish"]
+	path = consume_publish
+	url = https://github.com/ssichynskyi/web_metrics_posting.git
+[submodule "collect_produce"]
+	path = collect_produce
+	url = https://github.com/ssichynskyi/web_metric_collection.git
