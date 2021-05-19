@@ -1,0 +1,162 @@
+# End-to-end tests of the solution for web metrics collection
+
+## Table of contents:
+- [Task description](#task-description)
+- [Architecture overview](#architecture-overview)
+- [Setup and run](#setup-and-run)
+- [Out of scope](#out-of-scope)
+- [Known issues](#known-issues)
+- [ToDo](#todo)
+- [Nice to have](#nice-to-have)
+
+## Task description
+Implements a service that monitors website availability over the network, produces metrics:
+- http response time
+- http response status code
+- availability of pre-defined text
+and sends this to Kafka broker at Aiven
+
+## Architecture overview
+The overall system consists of these components:
+1. Python Kafka producer service which collect website metrics and
+sends them to pre-configured kafka web service
+
+2. Kafka consumer which gets messages from kafka webserver and stores them
+in Postgres database. Service is examining the number of messages in the topic,
+  consumes them, accumulates in RAM, and flushes them to postgres periodically.
+   For testing purposes it also has settings configuration: either auto-rate or
+   number of messages to send.
+
+3. End-to-end tests which start both services and check if they are well integrated
+
+## Setup and run
+Here and below: console snippets are relevant for latest Ubuntu versions
+1. Install latest Python3 version with pip
+```console
+$sudo apt update
+$sudo add-apt-repository ppa:deadsnakes/ppa
+$sudo apt update
+$sudo apt install python3.9
+$sudo apt install python3.9-distutils
+```
+2. Install pipenv. Depending on your envvars and previous Python2 and Python3 installations:
+You can find out the exact setup by commands:
+```console
+$which python
+$which python3
+$which python3.9
+```
+So, execute either
+```console
+$pip3 install --upgrade pip
+$pip3 install pipenv
+```
+or
+```console
+$python3.9 -m pip install --upgrade pip
+$python3.9 -m pip install pipenv
+```
+3. Clone this repository with submodules
+```console
+$git clone --recursive https://github.com/ssichynskyi/web_metrics_e2e_tests.git
+```
+4. Open local copy of your repo.
+Inside both folders: **collect-produce/**, **consume-publish/** do the following:
+- copy file **.env.example** to **.env**
+- copy file **config/service.yaml.example** to **config/service.yaml**
+and fill out all fields relevant for your setup
+
+5. Install dependencies:
+
+In project root:
+```console
+$pipenv shell
+$pipenv install --dev
+$pipenv install collect_produce/
+$pipenv install consume_publish/
+```
+
+6. [Optional] only for fetching the latest changes from submodules main branch
+From project root:
+```console
+$cd collect_produce/
+$git checkout main
+$git pull
+$cd ..
+$cd consume_publish/
+$git checkout main
+$git pull
+$cd ..
+$pipenv shell
+$pipenv sync
+```
+
+7. Run end-to-end tests
+Open project root (where this file resides)
+```console
+$pipenv shell
+$pytest tests/ [optional pytest params]
+```
+
+8. Run services and their tests separately
+- open relevant service submodule folder, e.g.
+    ```console
+    $cd collect_produce/
+    ```
+- make sure to make and fill with your data .env config/service.yaml inside this submodule
+- enable virtual environment:
+    ```console
+    $pipenv shell
+    ```
+- run service or tests:
+    ```console
+    $python3.9 src/service.py
+    # or
+    $pytest [optional pytest params]
+    ```
+
+## Out of scope
+Although useful in the real life the following items were excluded from the scope of this task:
+
+- scripts to setup, configure, run and delete Aiven Kafka broker
+
+- rolling out local kafka service in order to execute integration tests on local environment
+
+- full test coverage
+
+- organization of test reporting. Pytest and logging already care about collecting the necessary
+  Test reporting data. It's only required to select proper reporting package, execute pytest with
+  respective arguments, collect and publish the report (which is CI part). At the end implemented
+  tests are intended to catch errors prior release, not to produce fancy graphs :-)
+
+## Known issues
+- little code duplication between services like utils/env_config.py and service runners
+- if there's at least one message with corrupted format, the entire readout by consumer-publisher service
+will be rejected by DB and not posted. Not fixed because of lack of time and low importance
+- Not possible to ruin and debug services separately using this project via IDE, not possible to run
+  unit and integration tests for every service from this project (import problem).
+  (I consider this as low-to-medium priority issue because it's not a typical configuration and
+  because it's still possible to do so by entering each submodule, running and debugging services one-by-one.
+  At the end, this setup has only one major goal - to execute E2E tests. All the rest shall be done in
+  submodule environments/repos directly)
+  
+- Seems that pycharm reads out .env file incorrectly, therefore it's not possible to debug application
+  with default, reusable envvars style e.g.:
+  ```dotenv
+    PROJECT_ROOT=/path/to/project/root
+    PYTHONPATH=${PROJECT_ROOT}
+  ```
+  This problem is fixed easily by using only absolute imports for every case instead of substitution, e.g.
+  ```dotenv
+    PROJECT_ROOT=/path/to/project/root
+    PYTHONPATH=/path/to/project/root
+  ```
+
+## ToDo:
+- create CI for unit test execution
+- create CI for integration test execution
+
+## Nice to have:
+That's in addition to action items in ToDo
+- automatic style check using black: https://github.com/psf/black
+- CI for all tests

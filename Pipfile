@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 pytest = "*"
+webmetricscollectorconsumer = {path = "./collect_produce"}
+webmetricsconsumerpublisher = {path = "./consume_publish"}
 
 [dev-packages]
 
