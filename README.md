@@ -60,13 +60,16 @@ $python3.9 -m pip install pipenv
 ```console
 $git clone --recursive https://github.com/ssichynskyi/web_metrics_e2e_tests.git
 ```
-4. Open local copy of your repo.
+4. Instantiate and customize envvars and config files.
+In project root:
+- copy file **.env.example** to **.env** and fill out all fields relevant for your setup
+
 Inside both folders: **collect-produce/**, **consume-publish/** do the following:
 - copy file **.env.example** to **.env**
 - copy file **config/service.yaml.example** to **config/service.yaml**
 and fill out all fields relevant for your setup
 
-5. Install dependencies:
+6. Install dependencies:
 
 In project root:
 ```console
@@ -74,6 +77,7 @@ $pipenv shell
 $pipenv install --dev
 $pipenv install collect_produce/
 $pipenv install consume_publish/
+$pipenv sync
 ```
 
 6. [Optional] only for fetching the latest changes from submodules main branch
@@ -96,6 +100,7 @@ Open project root (where this file resides)
 ```console
 $pipenv shell
 $pytest tests/ [optional pytest params]
+$exit
 ```
 
 8. Run services and their tests separately
@@ -107,12 +112,15 @@ $pytest tests/ [optional pytest params]
 - enable virtual environment:
     ```console
     $pipenv shell
+    $pipenv install --dev
     ```
 - run service or tests:
     ```console
     $python3.9 src/service.py
     # or
+    $cd tests/
     $pytest [optional pytest params]
+    $exit
     ```
 
 ## Out of scope
