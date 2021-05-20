@@ -69,7 +69,7 @@ Inside both folders: **collect-produce/**, **consume-publish/** do the following
 - copy file **config/service.yaml.example** to **config/service.yaml**
 and fill out all fields relevant for your setup
 
-6. Install dependencies:
+5. Install dependencies:
 
 In project root:
 ```console
