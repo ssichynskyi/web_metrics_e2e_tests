@@ -18,14 +18,17 @@ and sends this to Kafka broker at Aiven
 
 ## Architecture overview
 The overall system consists of these components:
+
 1. Python Kafka producer service which collect website metrics and
-sends them to pre-configured kafka web service
+sends them to pre-configured kafka web service. See service [readme](https://github.com/ssichynskyi/web_metric_collection/blob/main/README.md)
+for more details.
 
 2. Kafka consumer which gets messages from kafka webserver and stores them
 in Postgres database. Service is examining the number of messages in the topic,
   consumes them, accumulates in RAM, and flushes them to postgres periodically.
    For testing purposes it also has settings configuration: either auto-rate or
-   number of messages to send.
+   number of messages to send. See service [readme](https://github.com/ssichynskyi/web_metrics_posting/blob/main/README.md)
+for more details.
 
 3. End-to-end tests which start both services and check if they are well integrated
 
@@ -69,7 +72,7 @@ Inside both folders: **collect-produce/**, **consume-publish/** do the following
 - copy file **config/service.yaml.example** to **config/service.yaml**
 and fill out all fields relevant for your setup
 
-6. Install dependencies:
+5. Install dependencies:
 
 In project root:
 ```console
@@ -116,11 +119,18 @@ $exit
     ```
 - run service or tests:
     ```console
-    $python3.9 src/service.py
+    $python3.9 src/service.py [optional args]
     # or
     $cd tests/
-    $pytest [optional pytest params]
+    $pytest [optional pytest args]
     $exit
+    ```
+    For information regarding optional service arguments plese see:
+    - [readme](https://github.com/ssichynskyi/web_metric_collection/blob/main/README.md)
+    - [readme](https://github.com/ssichynskyi/web_metrics_posting/blob/main/README.md)
+    or type:
+    ```console
+    $python3.9 src/service.py --help
     ```
 
 ## Out of scope
