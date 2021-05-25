@@ -151,7 +151,7 @@ Although useful in the real life the following items were excluded from the scop
 - little code duplication between services like utils/env_config.py and service runners
 - if there's at least one message with corrupted format, the entire readout by consumer-publisher service
 will be rejected by DB and not posted. Not fixed because of lack of time and low importance
-- Not possible to ruin and debug services separately using this project via IDE, not possible to run
+- Not possible to run and debug services separately using this project via IDE, not possible to run
   unit and integration tests for every service from this project (import problem).
   (I consider this as low-to-medium priority issue because it's not a typical configuration and
   because it's still possible to do so by entering each submodule, running and debugging services one-by-one.
@@ -170,11 +170,7 @@ will be rejected by DB and not posted. Not fixed because of lack of time and low
     PYTHONPATH=/path/to/project/root
   ```
 
-## ToDo:
-- create CI for unit test execution
-- create CI for integration test execution
-
 ## Nice to have:
 That's in addition to action items in ToDo
 - automatic style check using black: https://github.com/psf/black
-- CI for all tests
+- CI for e2e tests and Kafka consumer/producer integration smoke tests
