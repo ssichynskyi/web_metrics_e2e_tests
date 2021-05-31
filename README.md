@@ -1,6 +1,6 @@
 # End-to-end tests of the solution for web metrics collection
 
-## Table of contents:
+## Table of contents
 - [Task description](#task-description)
 - [Architecture overview](#architecture-overview)
 - [Setup and run](#setup-and-run)
@@ -69,6 +69,7 @@ In project root:
 
 Inside both folders: **collect-produce/**, **consume-publish/** do the following:
 - copy file **.env.example** to **.env**
+
 - copy file **config/service.yaml.example** to **config/service.yaml**
 and fill out all fields relevant for your setup
 
@@ -83,7 +84,7 @@ $pipenv install consume_publish/
 $pipenv sync
 ```
 
-6. [Optional] only for fetching the latest changes from submodules main branch
+6. \[Optional\] only for fetching the latest changes from submodules main branch
 From project root:
 ```console
 $cd collect_produce/
@@ -108,30 +109,34 @@ $exit
 
 8. Run services and their tests separately
 - open relevant service submodule folder, e.g.
-    ```console
-    $cd collect_produce/
-    ```
+  ```console
+  $cd collect_produce/
+  ```
+
 - make sure to make and fill with your data .env config/service.yaml inside this submodule
+
 - enable virtual environment:
-    ```console
-    $pipenv shell
-    $pipenv install --dev
-    ```
+  ```console
+  $pipenv shell
+  $pipenv install --dev
+  ```
+
 - run service or tests:
-    ```console
-    $python3.9 src/service.py [optional args]
-    # or
-    $cd tests/
-    $pytest [optional pytest args]
-    $exit
-    ```
-    For information regarding optional service arguments plese see:
-    - [readme](https://github.com/ssichynskyi/web_metric_collection/blob/main/README.md)
-    - [readme](https://github.com/ssichynskyi/web_metrics_posting/blob/main/README.md)
-    or type:
-    ```console
-    $python3.9 src/service.py --help
-    ```
+  ```console
+  $python3.9 src/service.py [optional args]
+  # or
+  $cd tests/
+  $pytest [optional pytest args]
+  $exit
+  ```
+
+  For information regarding optional service arguments plese see:
+  - [readme](https://github.com/ssichynskyi/web_metric_collection/blob/main/README.md)
+  - [readme](https://github.com/ssichynskyi/web_metrics_posting/blob/main/README.md)
+  or type:
+  ```console
+  $python3.9 src/service.py --help
+  ```
 
 ## Out of scope
 Although useful in the real life the following items were excluded from the scope of this task:
@@ -149,15 +154,17 @@ Although useful in the real life the following items were excluded from the scop
 
 ## Known issues
 - little code duplication between services like utils/env_config.py and service runners
+
 - if there's at least one message with corrupted format, the entire readout by consumer-publisher service
-will be rejected by DB and not posted. Not fixed because of lack of time and low importance
+  will be rejected by DB and not posted. Not fixed because of lack of time and low importance
+
 - Not possible to run and debug services separately using this project via IDE, not possible to run
   unit and integration tests for every service from this project (import problem).
   (I consider this as low-to-medium priority issue because it's not a typical configuration and
   because it's still possible to do so by entering each submodule, running and debugging services one-by-one.
   At the end, this setup has only one major goal - to execute E2E tests. All the rest shall be done in
   submodule environments/repos directly)
-  
+
 - Seems that pycharm reads out .env file incorrectly, therefore it's not possible to debug application
   with default, reusable envvars style e.g.:
   ```dotenv
@@ -170,7 +177,7 @@ will be rejected by DB and not posted. Not fixed because of lack of time and low
     PYTHONPATH=/path/to/project/root
   ```
 
-## Nice to have:
+## Nice to have
 That's in addition to action items in ToDo
-- automatic style check using black: https://github.com/psf/black
+- automatic style check using black or other similar tool: https://github.com/psf/black
 - CI for e2e tests and Kafka consumer/producer integration smoke tests
