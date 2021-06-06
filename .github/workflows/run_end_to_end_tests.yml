@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
     timeout-minutes: 10
 
     services:
@@ -68,6 +68,8 @@ jobs:
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
+          pipenv install collect_produce/
+          pipenv install consume_publish/
           pipenv install --dev
 
       - name: run end-to-end tests
