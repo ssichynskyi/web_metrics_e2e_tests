@@ -71,12 +71,9 @@ jobs:
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
-          ls -l
-          ls -l collect_produce
-          ls -l consume_publish
-          pipenv install ${{ github.workspace }}/collect_produce
-          pipenv install ${{ github.workspace }}/consume_publish
-          pipenv install
+#          pipenv install ${{ github.workspace }}/collect_produce
+#          pipenv install ${{ github.workspace }}/consume_publish
+          pipenv install --dev
 
       - name: run end-to-end tests
         run: |

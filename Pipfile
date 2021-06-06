@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 pytest = "*"
-
-[dev-packages]
 webmetricscollectproduce = {path = "./collect_produce"}
 webmetricsconsumepublish = {path = "./consume_publish"}
+
+[dev-packages]
 
 [requires]
 python_version = "3.9"
