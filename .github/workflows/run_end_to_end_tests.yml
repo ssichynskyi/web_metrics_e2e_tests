@@ -40,7 +40,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-          
+
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@2.1.1
+
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -68,6 +71,9 @@ jobs:
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
+          ls -l
+          ls -l collect_produce
+          ls -l consume_publish
           pipenv install ${{ github.workspace }}/collect_produce
           pipenv install ${{ github.workspace }}/consume_publish
           pipenv install
