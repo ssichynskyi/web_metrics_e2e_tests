@@ -1,0 +1,86 @@
+name: Run syntax checks, static code analysis and unit tests
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    timeout-minutes: 10
+
+    services:
+      zookeeper-server:
+        image: bitnami/zookeeper:latest
+        env:
+          ALLOW_ANONYMOUS_LOGIN: yes
+      kafka-server:
+        image: bitnami/kafka:latest
+        ports:
+          - 9092:9092
+        env:
+          ALLOW_PLAINTEXT_LISTENER: yes
+          KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: true
+          KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper-server:2181
+          KAFKA_BROKER_ID: 1
+          KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092'
+          KAFKA_CFG_ADVERTISED_LISTENERS: 'PLAINTEXT://localhost:9092'
+          KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      postgres-server:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: website_metrics
+          POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+          POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+          
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run syntax checks
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pipenv wheel
+
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --dev
+
+      - name: run end-to-end tests
+        run: |
+          echo 'run end-to-end tests...'
+          pipenv --envs --support --verbose run pytest tests -v -c tests/pytest.ini
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/collect_produce:${{ github.workspace }}/consume_publish
+          COLLECTION_CONFIG: ${{ github.workspace }}/collect_produce/config/service.yaml
+          PUBLISH_CONFIG: ${{ github.workspace }}/consume_publish/config/service.yaml
+          DB_LOGIN: admin
+          DB_PASS: password
+          DB: website_metrics
+          BROKER_SERVICE_PROVIDER: docker
+          STORAGE_SERVICE_PROVIDER: docker
