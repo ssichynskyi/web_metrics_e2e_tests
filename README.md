@@ -180,4 +180,3 @@ Although useful in the real life the following items were excluded from the scop
 ## Nice to have
 That's in addition to action items in ToDo
 - automatic style check using black or other similar tool: https://github.com/psf/black
-- CI for e2e tests and Kafka consumer/producer integration smoke tests
